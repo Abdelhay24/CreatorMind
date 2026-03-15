@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <!-- Stat Cards -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center transform transition-transform hover:-translate-y-1 hover:shadow-md cursor-pointer">
+        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-lightbulb text-xl"></i>
+        </div>
+        <div class="text-3xl font-bold text-gray-800">{{ ideas_count }}</div>
+        <div class="text-sm font-medium text-gray-500 mt-1 uppercase tracking-wide">Total Ideas</div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center transform transition-transform hover:-translate-y-1 hover:shadow-md cursor-pointer">
+        <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-spinner text-xl"></i>
+        </div>
+        <div class="text-3xl font-bold text-gray-800">{{ in_progress }}</div>
+        <div class="text-sm font-medium text-gray-500 mt-1 uppercase tracking-wide">In Progress</div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center transform transition-transform hover:-translate-y-1 hover:shadow-md cursor-pointer">
+        <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-calendar-check text-xl"></i>
+        </div>
+        <div class="text-3xl font-bold text-gray-800">{{ scheduled }}</div>
+        <div class="text-sm font-medium text-gray-500 mt-1 uppercase tracking-wide">Scheduled</div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center transform transition-transform hover:-translate-y-1 hover:shadow-md cursor-pointer">
+        <div class="w-12 h-12 rounded-full bg-green-50 text-green-500 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-check-double text-xl"></i>
+        </div>
+        <div class="text-3xl font-bold text-gray-800">{{ published }}</div>
+        <div class="text-sm font-medium text-gray-500 mt-1 uppercase tracking-wide">Published</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Next to Publish -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-800">Next Content to Publish</h2>
+            <i class="fa-solid fa-rocket text-brand-500"></i>
+        </div>
+        <div class="p-6">
+            {% if next_to_publish %}
+                <div class="flex items-start space-x-4">
+                    {% if next_to_publish.thumbnail %}
+                        <img src="{{ next_to_publish.thumbnail.url }}" alt="Thumbnail" class="w-24 h-24 object-cover rounded-lg shadow-sm">
+                    {% else %}
+                        <div class="w-24 h-24 bg-gray-100 rounded-lg shadow-sm flex items-center justify-center text-gray-400">
+                            <i class="fa-solid fa-image text-2xl"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div>
+                        <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mb-2">
+                            {{ next_to_publish.idea.platform }}
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">{{ next_to_publish.idea.title }}</h3>
+                        <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ next_to_publish.idea.description }}</p>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fa-regular fa-calendar mr-2"></i>
+                            <strong>{{ next_to_publish.publish_date|date:"F j, Y, P" }}</strong>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-regular fa-face-frown text-2xl text-gray-400"></i>
+                    </div>
+                    <p class="text-gray-500 text-sm">No content scheduled for publishing.</p>
+                    <a href="{% url 'pipeline' %}" class="mt-4 inline-block text-brand-600 hover:text-brand-500 font-medium text-sm">Go to Pipeline &rarr;</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-800">Quick Actions</h2>
+            <i class="fa-solid fa-bolt text-brand-500"></i>
+        </div>
+        <div class="p-6 grid grid-cols-2 gap-4">
+            <a href="{% url 'idea_create' %}" class="flex flex-col items-center justify-center p-6 bg-brand-50 text-brand-700 rounded-xl hover:bg-brand-100 transition-colors border border-brand-100">
+                <i class="fa-solid fa-plus text-2xl mb-2"></i>
+                <span class="font-medium">Jot Idea</span>
+            </a>
+            
+            <a href="{% url 'pipeline' %}" class="flex flex-col items-center justify-center p-6 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors border border-blue-100">
+                <i class="fa-solid fa-arrow-right-arrow-left text-2xl mb-2"></i>
+                <span class="font-medium">Move Status</span>
+            </a>
+            
+            <a href="{% url 'media_upload' %}" class="flex flex-col items-center justify-center p-6 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors border border-purple-100">
+                <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2"></i>
+                <span class="font-medium">Upload Media</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

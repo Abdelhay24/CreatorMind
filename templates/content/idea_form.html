@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="mb-4">
+        <a href="{% url 'idea_list' %}" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Back to Ideas
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="bg-red-50 text-red-800 p-4 rounded-md text-sm border border-red-200">
+                    <p class="font-bold">Please correct the errors below.</p>
+                </div>
+            {% endif %}
+
+            <div class="space-y-4">
+                <div>
+                    <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Idea Title *</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.platform.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Platform *</label>
+                        {{ form.platform }}
+                        {% if form.platform.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.platform.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.category.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="{{ form.priority.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Priority (0-10)</label>
+                    <p class="text-xs text-gray-500 mb-2">Higher number means higher priority.</p>
+                    {{ form.priority }}
+                    {% if form.priority.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.priority.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Description / Notes</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 flex justify-end space-x-3">
+                <a href="{% url 'idea_list' %}" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                    Cancel
+                </a>
+                <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                    Save Idea
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

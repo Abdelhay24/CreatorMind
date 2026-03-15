@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Delete Idea{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-10">
+    <div class="bg-white rounded-xl shadow-sm border border-red-100 p-8 text-center">
+        <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+        </div>
+        
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Delete this idea?</h2>
+        <p class="text-gray-500 mb-6">Are you sure you want to delete the idea <strong>"{{ idea.title }}"</strong>? This action cannot be undone and will also remove it from the content pipeline.</p>
+        
+        <form method="post" class="flex justify-center space-x-4">
+            {% csrf_token %}
+            <a href="{% url 'idea_list' %}" class="px-5 py-2.5 border border-gray-300 rounded-lg shadow-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors">
+                Cancel
+            </a>
+            <button type="submit" class="px-5 py-2.5 border border-transparent rounded-lg shadow-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                Yes, Delete
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

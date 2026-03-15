@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Content Calendar{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-xl font-bold text-gray-800">Scheduled Posts</h2>
+        <p class="text-sm text-gray-500">Upcoming content organized by publish date.</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6 text-center">
+    {% if scheduled_contents %}
+    <div class="space-y-4">
+        {% for content in scheduled_contents %}
+        <div class="flex items-center p-4 border border-gray-100 rounded-lg hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="absolute inset-y-0 left-0 w-1 {% if content.status == 'PUBLISHED' %}bg-green-500{% else %}bg-purple-500{% endif %}"></div>
+            
+            <div class="w-16 flex flex-col items-center justify-center border-r border-gray-100 pr-4 mr-4">
+                <span class="text-xs font-bold text-gray-500 uppercase">{{ content.publish_date|date:"M" }}</span>
+                <span class="text-2xl font-black text-gray-800">{{ content.publish_date|date:"j" }}</span>
+            </div>
+            
+            <div class="flex-1 text-left">
+                <div class="flex items-center space-x-2 mb-1">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
+                        {% if content.idea.platform == 'TikTok' %}bg-black text-white
+                        {% elif content.idea.platform == 'YouTube Shorts' %}bg-red-100 text-red-800
+                        {% elif content.idea.platform == 'Instagram Reels' %}bg-fuchsia-100 text-fuchsia-800
+                        {% else %}bg-blue-100 text-blue-800{% endif %}">
+                        {{ content.idea.platform }}
+                    </span>
+                    {% if content.status == 'PUBLISHED' %}
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-800">
+                        Published
+                    </span>
+                    {% endif %}
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">{{ content.idea.title }}</h3>
+                <p class="text-sm text-gray-500 line-clamp-1">{{ content.idea.description }}</p>
+            </div>
+            
+            <div class="ml-4 tabular-nums text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-md">
+                <i class="fa-regular fa-clock mr-1"></i> {{ content.publish_date|date:"P" }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="py-16">
+        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fa-regular fa-calendar-xmark text-3xl text-gray-400"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">No Scheduled Content</h3>
+        <p class="text-gray-500 mb-6 max-w-md mx-auto">You don't have any content scheduled yet. Move ideas through the pipeline and set publish dates to see them here.</p>
+        <a href="{% url 'pipeline' %}" class="inline-flex items-center px-5 py-2.5 border border-transparent rounded-lg shadow-sm font-medium text-white bg-brand-600 hover:bg-brand-700 transition-colors">
+            Go to Pipeline <i class="fa-solid fa-arrow-right ml-2"></i>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CreatorOS{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                @apply bg-white bg-opacity-70 backdrop-blur-lg border border-white border-opacity-20 shadow-xl;
+            }
+        }
+        body {
+            background-color: #f8fafc;
+        }
+        /* Custom scrollbar for kanban board */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="font-sans antialiased text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 glass-panel flex flex-col h-full border-r border-gray-200 z-10 relative">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200">
+            <i class="fa-solid fa-bolt text-brand-500 text-xl mr-2"></i>
+            <span class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-teal-500">CreatorOS</span>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+            <a href="{% url 'dashboard' %}" class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-all duration-200 group {% if request.resolver_match.url_name == 'dashboard' %}bg-brand-50 text-brand-600{% else %}text-gray-700{% endif %}">
+                <i class="fa-solid fa-house w-6 text-center {% if request.resolver_match.url_name == 'dashboard' %}text-brand-500{% else %}text-gray-400 group-hover:text-brand-500{% endif %} transition-colors"></i>
+                Dashboard
+            </a>
+            
+            <a href="{% url 'idea_list' %}" class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-all duration-200 group {% if 'idea' in request.resolver_match.url_name %}bg-brand-50 text-brand-600{% else %}text-gray-700{% endif %}">
+                <i class="fa-solid fa-lightbulb w-6 text-center {% if 'idea' in request.resolver_match.url_name %}text-brand-500{% else %}text-gray-400 group-hover:text-brand-500{% endif %} transition-colors"></i>
+                Ideas
+            </a>
+            
+            <a href="{% url 'pipeline' %}" class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-all duration-200 group {% if request.resolver_match.url_name == 'pipeline' %}bg-brand-50 text-brand-600{% else %}text-gray-700{% endif %}">
+                <i class="fa-solid fa-layer-group w-6 text-center {% if request.resolver_match.url_name == 'pipeline' %}text-brand-500{% else %}text-gray-400 group-hover:text-brand-500{% endif %} transition-colors"></i>
+                Pipeline
+            </a>
+            
+            <a href="{% url 'calendar' %}" class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-all duration-200 group {% if request.resolver_match.url_name == 'calendar' %}bg-brand-50 text-brand-600{% else %}text-gray-700{% endif %}">
+                <i class="fa-solid fa-calendar w-6 text-center {% if request.resolver_match.url_name == 'calendar' %}text-brand-500{% else %}text-gray-400 group-hover:text-brand-500{% endif %} transition-colors"></i>
+                Calendar
+            </a>
+            
+            <a href="{% url 'media_library' %}" class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-all duration-200 group {% if 'media' in request.resolver_match.url_name %}bg-brand-50 text-brand-600{% else %}text-gray-700{% endif %}">
+                <i class="fa-solid fa-photo-film w-6 text-center {% if 'media' in request.resolver_match.url_name %}text-brand-500{% else %}text-gray-400 group-hover:text-brand-500{% endif %} transition-colors"></i>
+                Media
+            </a>
+        </nav>
+        
+        <div class="px-6 py-4 border-t border-gray-200">
+            <a href="{% url 'idea_create' %}" class="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5">
+                <i class="fa-solid fa-plus mr-2"></i> New Idea
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full bg-slate-50 relative overflow-hidden">
+        <!-- Top header -->
+        <header class="h-16 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-gray-200 z-10 transition-all">
+            <h1 class="text-2xl font-semibold text-gray-800 tracking-tight">{% block header_title %}Dashboard{% endblock %}</h1>
+            <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-400 to-teal-400 text-white flex items-center justify-center shadow-md">
+                    <span class="text-sm font-bold">C</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Content area -->
+        <div class="flex-1 overflow-auto p-8 z-0">
+            <div class="max-w-7xl mx-auto drop-shadow-sm">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

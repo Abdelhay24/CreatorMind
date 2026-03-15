@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Content Pipeline{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-xl font-bold text-gray-800">Production Board</h2>
+        <p class="text-sm text-gray-500">Drag and drop content through the production stages.</p>
+    </div>
+</div>
+
+<!-- Kanban Board Container -->
+<div class="flex overflow-x-auto space-x-6 pb-4 h-[calc(100vh-220px)] items-start">
+    {% for status, label in statuses %}
+    <div class="flex-shrink-0 w-80 bg-gray-50/50 rounded-xl border border-gray-100 flex flex-col max-h-full">
+        <!-- Column Header -->
+        <div class="px-4 py-3 border-b border-gray-200 bg-white/50 backdrop-blur-sm rounded-t-xl flex justify-between items-center">
+            <h3 class="font-semibold text-gray-700 uppercase tracking-wider text-sm">{{ label }}</h3>
+            <span class="bg-gray-200 text-gray-600 py-0.5 px-2 rounded-full text-xs font-bold" id="count-{{ status }}">
+                {% for content in pipeline_data|dictsort:0 %}
+                    {% if content.0 == status %}{{ content.1|length }}{% endif %}
+                {% endfor %}
+            </span>
+        </div>
+        
+        <!-- Column Drop Zone -->
+        <div class="flex-1 overflow-y-auto p-3 space-y-3 kanban-column min-h-[150px]" data-status="{{ status }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% for item in pipeline_data.items %}
+                {% if item.0 == status %}
+                    {% for content in item.1 %}
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 cursor-move hover:shadow-md transition-shadow relative group" draggable="true" ondragstart="drag(event)" id="card-{{ content.id }}" data-id="{{ content.id }}">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider
+                                {% if content.idea.platform == 'TikTok' %}bg-black text-white
+                                {% elif content.idea.platform == 'YouTube Shorts' %}bg-red-100 text-red-800
+                                {% elif content.idea.platform == 'Instagram Reels' %}bg-fuchsia-100 text-fuchsia-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ content.idea.platform }}
+                            </span>
+                            <div class="text-gray-400 group-hover:text-brand-500 transition-colors">
+                                <i class="fa-solid fa-grip-vertical"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-1 leading-snug">{{ content.idea.title }}</h4>
+                        {% if content.publish_date %}
+                        <div class="flex items-center text-xs text-gray-500 mt-3 pt-2 border-t border-gray-50">
+                            <i class="fa-regular fa-calendar mr-1"></i> {{ content.publish_date|date:"M j" }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function allowDrop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.add('bg-brand-50', 'bg-opacity-50');
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.currentTarget.id);
+        ev.currentTarget.classList.add('opacity-50');
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        
+        const kanbanColumns = document.querySelectorAll('.kanban-column');
+        kanbanColumns.forEach(col => col.classList.remove('bg-brand-50', 'bg-opacity-50'));
+
+        const data = ev.dataTransfer.getData("text");
+        const card = document.getElementById(data);
+        card.classList.remove('opacity-50');
+        
+        let dropTarget = ev.target;
+        while (!dropTarget.classList.contains('kanban-column') && dropTarget !== document.body) {
+            dropTarget = dropTarget.parentNode;
+        }
+
+        if (dropTarget.classList.contains('kanban-column')) {
+            dropTarget.appendChild(card);
+            
+            const contentId = card.getAttribute('data-id');
+            const newStatus = dropTarget.getAttribute('data-status');
+            
+            // Update counts purely visually
+            updateCounts();
+            
+            // Send AJAX request
+            fetch('{% url "update_content_status" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    content_id: contentId,
+                    new_status: newStatus
+                })
+            }).then(response => {
+                if (!response.ok) {
+                    console.error('Failed to update status');
+                }
+            }).catch(error => console.error('Error:', error));
+        }
+    }
+    
+    // Add event listeners to remove highlighting if drag leaves column
+    document.querySelectorAll('.kanban-column').forEach(col => {
+        col.addEventListener('dragleave', function(e) {
+            this.classList.remove('bg-brand-50', 'bg-opacity-50');
+        });
+        
+        col.addEventListener('dragend', function(e) {
+            document.querySelectorAll('.kanban-column').forEach(c => c.classList.remove('bg-brand-50', 'bg-opacity-50'));
+            document.querySelectorAll('.cursor-move').forEach(c => c.classList.remove('opacity-50'));
+        });
+    });
+
+    function updateCounts() {
+        const columns = document.querySelectorAll('.kanban-column');
+        columns.forEach(col => {
+            const status = col.getAttribute('data-status');
+            const count = col.querySelectorAll('.cursor-move').length;
+            const countBadge = document.getElementById('count-' + status);
+            if (countBadge) {
+                countBadge.textContent = count;
+            }
+        });
+    }
+</script>
+{% endblock %}
