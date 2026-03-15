@@ -1,18 +1,13 @@
+# Virtual environment
 venv/
-./db.sqlite3
-*.pyc
+env/
+
+# Python cache
 __pycache__/
-.DS_Store
-*.log
-*.env
-*.pot
-*.mo
 *.pyc
-*.pyo
-*.pyd
-*.swp
-*.swo
-*.bak
-*.tmp
-*.egg-info/
-dist/
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
